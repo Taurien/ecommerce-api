@@ -190,7 +190,7 @@ exports.purchaseOrder = catchAsync(async (req, res, next) => {
 		include: [
 			{
 				model: ProductInCart,
-				attributes: { exclude: ['id', 'cartId'] },
+				attributes: { exclude: ['id', 'cartId', 'status'] },
 				where: { status: 'active' },
 				include: [
 					{
@@ -263,10 +263,10 @@ exports.purchaseOrder = catchAsync(async (req, res, next) => {
 
 	await Promise.all(orderPromises)
 
-
-	// await new Email(useremail).sendReceipt(newUser.name, newUser.email)
 	// The email must contain the total price and the list of products that it purchased
-
+	const purchasedItems = userCart.productsInCarts
+	await new Email(currentUser.email).sendReceipt(currentUser.name, purchasedItems, userCart.totalPrice)
+	
 	res.status(204).json({ status: 'success'})
 })
 
