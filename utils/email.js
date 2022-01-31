@@ -12,15 +12,15 @@ class Email {
 	}
 
 	createTransport() {
-		if (process.env.NODE_ENV === 'development') {
-			return nodemailer.createTransport({
-				service: 'SendGrid',
-				auth: {
-					user: process.env.SENDGRID_NAME,
-					pass: process.env.SENDGRID_API_KEY,
-				},
-			})
-		}
+		// if (process.env.NODE_ENV === 'development') {
+		// 	return nodemailer.createTransport({
+		// 		service: 'SendGrid',
+		// 		auth: {
+		// 			user: process.env.SENDGRID_NAME,
+		// 			pass: process.env.SENDGRID_API_KEY,
+		// 		},
+		// 	})
+		// }
 
 
 		return nodemailer.createTransport({
@@ -58,7 +58,11 @@ class Email {
 	}
 
 	async sendWelcome(username, email) {
-		await this.send('welcome', 'New account!', { username, email })
+		await this.send('welcome', 'New account :D', { username, email })
+	}
+
+	async sendReceipt(username, products, totalprice) {
+		await this.send('receipt', 'Receipt :D', { username, products, totalprice })
 	}
 }
 

@@ -10,6 +10,7 @@ const { catchAsync } = require('../utils/catchAsync')
 const { filterObj } = require('../utils/filterObj')
 const { AppError } = require('../utils/appError')
 const { formatUserCart } = require('../utils/queryFormat')
+const { Email } = require('../utils/email')
 
 exports.getUserCart = catchAsync(async (req, res, next) => {
 	const { currentUser } = req
@@ -239,5 +240,57 @@ exports.purchaseOrder = catchAsync(async (req, res, next) => {
 			})
 		})
 
+	// Send email to the user that purchased the order
+	// await new Email(useremail).sendReceipt(newUser.name, newUser.email)
+	// The email must contain the total price and the list of products that it purchased
+
 	res.status(204).json({ status: 'success'})
 })
+
+// Create a controller a function that gets all the user's orders
+// The response must include all products that purchased 
+exports.pastOrders = catchAsync(async (req, res, next) => {
+	const { currentUser } = req
+
+	const userPastOrders = await Order.findAll({
+		where: { userId: currentUser.id },
+		include: [
+			{
+				model: ProductInOrder,
+				attributes: { exclude: [ 'id', 'orderId' ] },
+				include: [
+					{
+						model: Product,
+						attributes: {
+							exclude: [ 'userId', 'quantity', 'status' ]
+						}
+					}
+				]
+			}
+		]
+	})
+
+	if (!userPastOrders) return next(new AppError(`you haven't bought anything yet`, 404))
+
+	res.status(200).json({
+		status: 'success',
+		data: { userPastOrders }
+	})
+})
+
+// const imgsPromises = req.files.productImgs.map(async img => {
+
+//     const imgName = `/img/products/${newProduct.id}-${currentUser.id}-${img.originalname}`
+// 		const imgRef = ref(firebaseStorage, imgName)
+    
+// 		const result = await uploadBytes(imgRef, img.buffer)
+//     //log-result
+    
+// 		await ProductImg.create({
+// 			productId: newProduct.id,
+// 			imgPath: result.metadata.fullPath,
+// 		})
+    
+// 	})
+
+// 	await Promise.all(imgsPromises)

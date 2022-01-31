@@ -5,7 +5,8 @@ const {
     addProductToCart,
     getUserCart,
     updateCart,
-    purchaseOrder
+    purchaseOrder,
+    pastOrders
 } = require('../controllers/orders.controller')
 
 // Middlewares
@@ -23,6 +24,8 @@ router.post('/add-to-cart', addProductToCart)
 router.patch('/update-cart', updateCartValidations, validateResult, updateCart)
 
 router.patch('/buy', purchaseOrder)
+
+router.get('/order-list', pastOrders)
 // router.('', )
 
 // router.('', )
