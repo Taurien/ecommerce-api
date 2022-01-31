@@ -1,5 +1,7 @@
 const express = require('express')
 
+const { multerUpload } = require('../utils/multer')
+
 // Controllers
 const {
         createProduct,
@@ -22,7 +24,14 @@ router.use(verifyJWT)
 // Create new product
 router.route('/')
         .get(getAllProducts)
-        .post(createProductValidations, validateResult, createProduct)
+        .post(
+                // multerUpload.single('productImg'), to upload one
+                multerUpload.fields([
+                        { name: 'productImgs', maxCount: 2 },  // define/set # of imgs to upload
+                ]),
+                createProductValidations,
+                validateResult,
+                createProduct)
         // .get(verifyJWT, getAllProducts)
         // .post(verifyJWT, createProduct)
 

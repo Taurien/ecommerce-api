@@ -1,13 +1,15 @@
-const { Op } = require('sequelize')
+const { ref, uploadBytes } = require('firebase/storage')
 
 // Models
 const { Product } = require('../models/product.model')
+const { ProductImg } = require('../models/productImg.model')
 const { User } = require('../models/user.model')
 
 // Utils
 const { catchAsync } = require("../utils/catchAsync")
 const { AppError } = require('../utils/appError')
 const { filterObj } = require('../utils/filterObj')
+const { firebaseStorage, firebaseApp } = require('../utils/firebase.config')
 
 exports.createProduct = catchAsync(async (req, res, next) => {
     
@@ -15,8 +17,33 @@ exports.createProduct = catchAsync(async (req, res, next) => {
 
   const userId = req.currentUser.id
 
-  const newProduct = await Product.create({ name, description, price, quantity, category, userId })
-  
+  const newProduct = await Product.create({
+    name,
+    description,
+    price,
+    quantity,
+    category,
+    userId
+  })
+
+  //Save img path
+	const imgsPromises = req.files.productImgs.map(async img => {
+
+    const imgName = `/img/products/${newProduct.id}-${currentUser.id}-${img.originalname}`
+		const imgRef = ref(firebaseStorage, imgName)
+    
+		const result = await uploadBytes(imgRef, img.buffer)
+    //log-result
+    
+		await ProductImg.create({
+			productId: newProduct.id,
+			imgPath: result.metadata.fullPath,
+		})
+    
+	})
+
+	await Promise.all(imgsPromises)
+
   res.status(200).json({
   status: 'success',
       data: { newProduct }
@@ -27,7 +54,10 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
   
   const allProducts = await Product.findAll({
     where: { status: 'active' },
-    include: [{ model: User, attributes: { exclude: ['id', 'password', 'status'] } }]
+    include: [
+      { model: User, attributes: { exclude: ['id', 'password', 'status'] } },
+      { model: ProductImg }
+    ]
   })
 
   res.status(200).json({

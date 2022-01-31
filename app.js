@@ -34,7 +34,8 @@ app.use(
 app.use(express.static( path.join(__dirname, 'views') ))
 app.set('view-engine', 'pug')
 
-app.use(express.urlencoded())
+// content-type: application/json DEFAULT V ->   multi
+app.use(express.urlencoded({ extended: true })) 
 app.use(express.json())
 
 app.use('*', cors())

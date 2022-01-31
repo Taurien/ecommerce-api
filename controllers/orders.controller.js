@@ -215,9 +215,7 @@ exports.purchaseOrder = catchAsync(async (req, res, next) => {
 		date: new Date().toLocaleString(),
 		status: 'sold'
 	})
-
 	
-
 	await ProductInCart.findAll({ where: { cartId: userCart.id }}) ////{where: { cartId: userCart.id, productId: X }
 		.then(async (products) => {
 			products.map(async (el) => {
