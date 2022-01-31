@@ -18,9 +18,9 @@ const { AppError } = require('./appError')
 const multerstorage = multer.memoryStorage()
 
 const fileFilter = (req, file, cb) => {
-    if (!file.mymeType.startsWith('image')) {
-        cb(new AppError('Invalid file', 400))
-    }
+    if (!file.mimetype.startsWith('image')) {
+		return cb(new AppError('Invalid file', 400), false);
+	}
 
     cb(null, true)
 }

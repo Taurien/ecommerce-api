@@ -3,15 +3,18 @@ const { initializeApp } = require('firebase/app')
 const { getStorage } = require('firebase/storage')
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
+const dotenv = require('dotenv')
+
+dotenv.config({ path: './config.env' })
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBof8i-BaG1OC-1OHSELqAwWroQOr3silw",
-  authDomain: "ecommerce-ad284.firebaseapp.com",
-  projectId: "ecommerce-ad284",
-  storageBucket: "ecommerce-ad284.appspot.com",
-  messagingSenderId: "490596583427",
-  appId: "1:490596583427:web:bb997e47152c81013d6636"
+  apiKey: process.env.FIREBASE_apiKey,
+  authDomain: process.env.FIREBASE_authDomain,
+  projectId: process.env.FIREBASE_projectId,
+  storageBucket: process.env.FIREBASE_storageBucket,
+  messagingSenderId: process.env.FIREBASE_messagingSenderId,
+  appId: process.env.FIREBASE_appId
 };
 
 // Initialize Firebase

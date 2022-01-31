@@ -25,7 +25,7 @@ router.use(verifyJWT)
 router.route('/')
         .get(getAllProducts)
         .post(
-                // multerUpload.single('productImg'), to upload one
+                // multerUpload.single('productImg'), //to upload one
                 multerUpload.fields([
                         { name: 'productImgs', maxCount: 2 },  // define/set # of imgs to upload
                 ]),

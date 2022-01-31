@@ -27,9 +27,10 @@ exports.createProduct = catchAsync(async (req, res, next) => {
   })
 
   //Save img path
+  // console.log(req.files)
 	const imgsPromises = req.files.productImgs.map(async img => {
 
-    const imgName = `/img/products/${newProduct.id}-${currentUser.id}-${img.originalname}`
+    const imgName = `/img/products/${newProduct.id}-${userId}-${img.originalname}`
 		const imgRef = ref(firebaseStorage, imgName)
     
 		const result = await uploadBytes(imgRef, img.buffer)

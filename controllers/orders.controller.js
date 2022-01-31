@@ -217,30 +217,53 @@ exports.purchaseOrder = catchAsync(async (req, res, next) => {
 		status: 'sold'
 	})
 	
-	await ProductInCart.findAll({ where: { cartId: userCart.id }}) ////{where: { cartId: userCart.id, productId: X }
-		.then(async (products) => {
-			products.map(async (el) => {
+	// await ProductInCart.findAll({ where: { cartId: userCart.id }}) ////{where: { cartId: userCart.id, productId: X }
+	// 	.then(async (products) => {
+	// 		products.map(async (el) => {
 				
-				// Set productInCart status to 'purchased', search for cartId and productId
-					await el.update({ status: 'purchased' }, {where: { productId: el.id }}) //{where: { cartId: userCart.id, productId: el.id }
+	// 			// Set productInCart status to 'purchased', search for cartId and productId
+	// 				await el.update({ status: 'purchased' }, {where: { productId: el.id }}) //{where: { cartId: userCart.id, productId: el.id }
 		
-				// Look for the Product (productId), substract and update the requested qty from the product's qty
-					await Product.findAll({ where: { id: el.id } })
-						// .then( res =>  console.log(res[0].quantity, el.quantity))
-						.then(res => res[0].update({ quantity: res[0].quantity - el.quantity })) //STOCK minus requested qty
+	// 			// Look for the Product (productId), substract and update the requested qty from the product's qty
+	// 				await Product.findAll({ where: { id: el.id } })
+	// 					// .then( res =>  console.log(res[0].quantity, el.quantity))
+	// 					.then(res => res[0].update({ quantity: res[0].quantity - el.quantity })) //STOCK minus requested qty
 
-				// Create productInOrder, pass orderId, productId, qty, price
-					await ProductInOrder.create({
-						orderId: userOrder.id,
-						productId: el.id,
-						price: el.price,
-						quantity: el.quantity,
-						status: 'sold'
-					})
-			})
+	// 			// Create productInOrder, pass orderId, productId, qty, price
+	// 				await ProductInOrder.create({
+	// 					orderId: userOrder.id,
+	// 					productId: el.id,
+	// 					price: el.price,
+	// 					quantity: el.quantity,
+	// 					status: 'sold'
+	// 				})
+	// 		})
+	// 	})
+
+	const orderPromises = userCart.productsInCarts.map(async (el) => {
+
+	// Set productInCart status to 'purchased', search for cartId and productId
+		await ProductInCart.findOne({ where: { cartId: userCart.id, productId: el.productId } })
+			.then(res => res.update({ status: 'purchased' }))
+	
+	// Look for the Product (productId), substract and update the requested qty from the product's qty
+		await Product.findOne({ where: { id: el.productId } })
+			.then(res => res.update({ quantity: res.quantity - el.quantity })) //STOCK minus requested qty
+
+	// Create productInOrder, pass orderId, productId, qty, price
+		await ProductInOrder.create({
+			orderId: userOrder.id,
+			productId: el.productId,
+			price: el.price,
+			quantity: el.quantity,
+			status: 'sold'
 		})
 
-	// Send email to the user that purchased the order
+	})
+
+	await Promise.all(orderPromises)
+
+
 	// await new Email(useremail).sendReceipt(newUser.name, newUser.email)
 	// The email must contain the total price and the list of products that it purchased
 
@@ -277,20 +300,3 @@ exports.pastOrders = catchAsync(async (req, res, next) => {
 		data: { userPastOrders }
 	})
 })
-
-// const imgsPromises = req.files.productImgs.map(async img => {
-
-//     const imgName = `/img/products/${newProduct.id}-${currentUser.id}-${img.originalname}`
-// 		const imgRef = ref(firebaseStorage, imgName)
-    
-// 		const result = await uploadBytes(imgRef, img.buffer)
-//     //log-result
-    
-// 		await ProductImg.create({
-// 			productId: newProduct.id,
-// 			imgPath: result.metadata.fullPath,
-// 		})
-    
-// 	})
-
-// 	await Promise.all(imgsPromises)
