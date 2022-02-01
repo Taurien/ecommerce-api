@@ -12,15 +12,15 @@ class Email {
 	}
 
 	createTransport() {
-		// if (process.env.NODE_ENV === 'development') {
-		// 	return nodemailer.createTransport({
-		// 		service: 'SendGrid',
-		// 		auth: {
-		// 			user: process.env.SENDGRID_NAME,
-		// 			pass: process.env.SENDGRID_API_KEY,
-		// 		},
-		// 	})
-		// }
+		if (process.env.NODE_ENV === 'production') {
+			return nodemailer.createTransport({
+				service: 'SendGrid',
+				auth: {
+					user: process.env.SENDGRID_NAME,
+					pass: process.env.SENDGRID_API_KEY,
+				},
+			})
+		}
 
 
 		return nodemailer.createTransport({

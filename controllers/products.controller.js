@@ -26,24 +26,25 @@ exports.createProduct = catchAsync(async (req, res, next) => {
     userId
   })
 
-  //Save img path
-  // console.log(req.files)
-	const imgsPromises = req.files.productImgs.map(async img => {
-
-    const imgName = `/img/products/${newProduct.id}-${userId}-${img.originalname}`
-		const imgRef = ref(firebaseStorage, imgName)
-    
-		const result = await uploadBytes(imgRef, img.buffer)
-    //log-result
-    
-		await ProductImg.create({
-			productId: newProduct.id,
-			imgPath: result.metadata.fullPath,
-		})
-    
-	})
-
-	await Promise.all(imgsPromises)
+  if (req. file || req.files) {
+    //Save img path
+    const imgsPromises = req.files.productImgs.map(async img => {
+  
+      const imgName = `/img/products/${newProduct.id}-${userId}-${img.originalname}`
+    	const imgRef = ref(firebaseStorage, imgName)
+      
+    	const result = await uploadBytes(imgRef, img.buffer)
+      //log-result
+      
+    	await ProductImg.create({
+    		productId: newProduct.id,
+    		imgPath: result.metadata.fullPath,
+    	})
+      
+    })
+  
+    await Promise.all(imgsPromises)
+  }
 
   res.status(200).json({
   status: 'success',
