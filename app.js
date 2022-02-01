@@ -4,6 +4,9 @@ const cookieParser = require('cookie-parser')
 const xss = require('xss-clean')
 const rateLimit = require('express-rate-limit')
 const path = require('path')
+const helmet = require('helmet')
+const compression = require('compression')
+const morgan = require('morgan');
 
 // Routers
 const { userRouter } = require('./routes/users.routes')
@@ -22,6 +25,8 @@ const { AppError } = require('./utils/appError')
 const app = express()
 
 app.use(xss())
+app.use(helmet())
+app.use(compression())
 
 app.use(
 	rateLimit({
@@ -41,6 +46,8 @@ app.use(express.json())
 app.use('*', cors())
 
 app.use(cookieParser())
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
+else app.use(morgan('combined'))
 
 // Endpoints
 app.use('/', viewsRouter)
