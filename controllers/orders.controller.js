@@ -300,3 +300,35 @@ exports.pastOrders = catchAsync(async (req, res, next) => {
 		data: { userPastOrders }
 	})
 })
+
+exports.getOrderById = catchAsync(async (req, res, next) => {
+	const { currentUser, params } = req
+	
+	// Find the order by a given ID
+	// Must get the total price of the order and the prices of the products and how much the user bought
+	const order = await Order.findOne({
+		where: { id: params.id ,userId: currentUser.id },
+		include: [
+			{
+				// Must include the products of that order
+				model: ProductInOrder,
+				attributes: { exclude: [ 'id', 'orderId' ] },
+				include: [
+					{
+						model: Product,
+						attributes: {
+							exclude: [ 'userId', 'quantity', 'status' ]
+						}
+					}
+				]
+			}
+		]
+	})
+
+	if (!order) return next(new AppError(`theres no order registered with the following id`, 404))
+
+	res.status(200).json({
+		status: 'success',
+		data: { order }
+	})
+})

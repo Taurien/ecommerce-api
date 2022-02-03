@@ -6,7 +6,8 @@ const {
     getUserCart,
     updateCart,
     purchaseOrder,
-    pastOrders
+    pastOrders,
+    getOrderById
 } = require('../controllers/orders.controller')
 
 // Middlewares
@@ -26,10 +27,6 @@ router.patch('/update-cart', updateCartValidations, validateResult, updateCart)
 router.patch('/buy', purchaseOrder)
 
 router.get('/order-list', pastOrders)
-// router.('', )
-
-// router.('', )
-
-// router.('', )
+router.get('/order-list/:id', getOrderById)
 
 module.exports = { ordersRouter: router }
