@@ -12,6 +12,7 @@ const sendErrorDev = (err, req, res, next) => {
 	});
 }
 
+
 const sendErrorProd = (err, req, res, next) => {
 	return res.status(err.statusCode).json({
 		status: err.status,
