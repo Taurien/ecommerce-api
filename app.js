@@ -24,10 +24,26 @@ const { AppError } = require('./utils/appError')
 // Init app
 const app = express()
 
-app.use(xss())
-app.use(helmet())
-app.use(compression())
+app.enable('trust proxy');
 
+app.set('view-engine', 'pug')
+app.use(express.static( path.join(__dirname, 'views') ))
+
+// Global Middlewares
+// Implement CORS
+app.use(cors()); //Access-Control-Allow-Origin *
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' })); //Access-Control-Allow-Origin *
+app.options('*', cors());
+
+// Set security HTTP headers
+app.use(helmet())
+
+// Development logging
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
+else app.use(morgan('combined'))
+
+
+// Limit requests from same API
 app.use(
 	rateLimit({
 		max: 500,
@@ -36,18 +52,18 @@ app.use(
 	})
 )
 
-app.use(express.static( path.join(__dirname, 'views') ))
-app.set('view-engine', 'pug')
-
+// Body parser, reading data from the body into req.body
+app.use(express.json())
 // content-type: application/json DEFAULT V ->   multi
 app.use(express.urlencoded({ extended: true })) 
-app.use(express.json())
-
-app.use('*', cors())
-
 app.use(cookieParser())
-if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
-else app.use(morgan('combined'))
+
+// Data sanitization against XSS
+app.use(xss())
+
+// Compress responses
+app.use(compression())
+
 
 // Endpoints
 app.use('/', viewsRouter)
@@ -55,7 +71,8 @@ app.use('/api/v1/users', userRouter)
 app.use('/api/v1/products', productsRouter)
 app.use('/api/v1/orders', ordersRouter)
 
-app.use('*', (req, res, next) => {
+
+app.all('*', (req, res, next) => {
 	next(new AppError(`Can't find ${req.originalUrl} on this server`, 404))
 })
 

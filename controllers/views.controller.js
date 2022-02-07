@@ -1,5 +1,5 @@
 const path = require('path')
 
 exports.renderIndex = (req, res, next) => {
-	res.status(200).render('welcome.pug', { message: 'Hello from NodeJS' })
+	res.status(200).render('welcome.pug', { message: 'Hello from NodeJS xD' })
 }

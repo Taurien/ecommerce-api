@@ -241,8 +241,10 @@ exports.purchaseOrder = catchAsync(async (req, res, next) => {
 	// 	})
 
 	const orderPromises = userCart.productsInCarts.map(async (el) => {
+		
 
 	// Set productInCart status to 'purchased', search for cartId and productId
+		// * await el.update({ status: 'purchased' })
 		await ProductInCart.findOne({ where: { cartId: userCart.id, productId: el.productId } })
 			.then(res => res.update({ status: 'purchased' }))
 	
