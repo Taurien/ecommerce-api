@@ -27,14 +27,17 @@ const app = express()
 app.enable('trust proxy');
 
 app.set('view-engine', 'pug')
+app.set('views', path.join(__dirname, 'views'));
 app.use(express.static( path.join(__dirname, 'views') ))
 
 // Global Middlewares
 // Implement CORS
 app.use(cors()); //Access-Control-Allow-Origin *
-app.use(cors({ credentials: true, origin: 'https://taurien.github.io/ecommerce-front/' })); //Access-Control-Allow-Origin *
-// app.use(cors({ credentials: true, origin: 'http://localhost:3000' })); //Access-Control-Allow-Origin *
 app.options('*', cors());
+// app.use(cors({ credentials: true, origin: 'http://localhost:3000' })); //Access-Control-Allow-Origin *
+
+// Serving static files
+// app.use(express.static(path.join(__dirname, 'client', 'build')));
 
 // Set security HTTP headers
 app.use(helmet())
@@ -45,13 +48,12 @@ else app.use(morgan('combined'))
 
 
 // Limit requests from same API
-app.use(
-	rateLimit({
+const limiter =	rateLimit({
 		max: 500,
 		windowMs: 60 * 60 * 1000, // 1 hour
 		message: 'Too many requests from this IP',
-	})
-)
+})
+app.use('/api', limiter);
 
 // Body parser, reading data from the body into req.body
 app.use(express.json())
