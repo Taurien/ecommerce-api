@@ -32,7 +32,7 @@ app.use(express.static( path.join(__dirname, 'views') ))
 // Global Middlewares
 // Implement CORS
 app.use(cors()); //Access-Control-Allow-Origin *
-app.use(cors({ credentials: true, origin: 'http://https://taurien.github.io' })); //Access-Control-Allow-Origin *
+app.use(cors({ credentials: true, origin: 'https://taurien.github.io/ecommerce-front/' })); //Access-Control-Allow-Origin *
 // app.use(cors({ credentials: true, origin: 'http://localhost:3000' })); //Access-Control-Allow-Origin *
 app.options('*', cors());
 
