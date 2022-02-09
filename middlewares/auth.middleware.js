@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 const { Op } = require('sequelize');
+const { promisify } = require('util');
 
 // Models
 const { User } = require('../models/user.model');
@@ -25,12 +26,19 @@ exports.verifyJWT = catchAsync(async (req, res, next) => {
         return next(new AppError('Invalid session', 401))
     }
     
-    const result = jwt.verify(token, process.env.JWT_KEY)
+    // const result = jwt.verify(token, process.env.JWT_KEY)
 
+    // Validate token
+	const decoded = await promisify(jwt.verify)(token, process.env.JWT_KEY);
+
+	if (!decoded) return next(new AppError('Invalid token', 401));
+
+    
     const user = await User.findOne({
         attributes: { exclude: ['password'] },
         where: { id: result.id, status: 'available' }
     })
+    
 
     if (!user) {
         return next(new AppError('User session is not longer valid' ,401))
