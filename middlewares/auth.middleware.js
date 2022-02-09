@@ -36,7 +36,7 @@ exports.verifyJWT = catchAsync(async (req, res, next) => {
     
     const user = await User.findOne({
         attributes: { exclude: ['password'] },
-        where: { id: result.id, status: 'available' }
+        where: { id: decoded.id, status: 'available' }
     })
     
 
