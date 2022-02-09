@@ -176,8 +176,12 @@ exports.updateCart = catchAsync(async (req, res, next) => {
 
 	// Calculate new total price
 	await userCart.update({ totalPrice: updatedTotalPrice })
+
 	
-	res.status(204).json({ status: 'success' })
+	res.status(200).json({
+		status: 'success',
+		data: itemInCart
+	})
 })
 
 exports.purchaseOrder = catchAsync(async (req, res, next) => {
